@@ -1,4 +1,4 @@
-from HMM.HMMUtils import forward, backward, buildObservationMatrix, normalizeVector
+from HMM.HMMUtils import forward, backward, normalizeVector
 from HMM.SleepMMVariables import Sleep_S
 
 import numpy as np
@@ -6,11 +6,18 @@ import numpy as np
     @param HMM: 
         The hidden markov model, which defines a transition model and prior distribution
 
-    @ev:
-        A vector of evidence from time 1...t
+    @param ev: [....(E1...EN)]
+        The list of evidence from time 1...t
+        where the entries are tuples with the evidence values of all evidence variables.
     
-    @t:
+    @param t:
         The current time step
+    
+    @returns [...np.array(S, 1)]
+        A list of probability distributions from time 1...t, 
+        where S is the number of values in the state variable.
+
+        This represents the smoothed probability distributions from time 1...t
 """
 def countryDance(HMM, ev, t):
     allForwardVectors = [HMM.priorMatrix]
