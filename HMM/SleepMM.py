@@ -16,6 +16,13 @@ class SleepMM(HMM):
         super().__init__(transTable, sensorTable, priorTable)
         self.transMatrix = transMatrix
         self.priorMatrix = priorMatrix
+    
+    def lookUpProb_GivenEvidenceAndStateValues(
+        self, redEyesValue_E, sleepInClassValue_E, enoughSleepValue_E
+    ):
+        return self.sensorTable[(
+            redEyesValue_E, sleepInClassValue_E, enoughSleepValue_E
+        )]
 
 def getSleepMM():
 
