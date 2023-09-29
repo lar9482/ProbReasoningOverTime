@@ -2,6 +2,7 @@ from HMM.SleepMM import getSleepMM
 from HMM.SleepMMVariables import SleepInClass_E, RedEyes_E
 
 from countryDance import countryDance
+
 def main():
     sleepMM = getSleepMM()
     evidenceTuple = (RedEyes_E.notRedEyes.value, SleepInClass_E.sleepInClass.value)

@@ -1,6 +1,22 @@
 from HMM.SleepMMVariables import Sleep_S
 import numpy as np
 
+"""
+    Computes the new forward message vector from the equation
+    f_(1:t+1) = αO_(t+1)T^(T)f_(1:t)
+    @param HMM:
+        The hidden markov model, which defines a transition model and prior distribution
+
+    @param prevForwardVector: np.array((S x 1))
+        The forward message vector from the previous time step
+        where S is the number of values for the state variable.
+
+    @currEvidence: (E1,..,EN)
+        The values for the evidence at the current time step.
+
+    @returns currForwardVector: np.array((S x 1))
+        The current forward msg vector.
+"""
 def forward(HMM, prevForwardVector, currEvidence):
     observationMatrix = buildObservationMatrix(HMM, currEvidence)
 
@@ -11,6 +27,23 @@ def forward(HMM, prevForwardVector, currEvidence):
 
     return normalizeVector(futureForwardVector)
 
+"""
+    Computes the backward message vector using the equation
+    b_(k+1:t) = T O_(k+1) b_(k+2:t)
+    
+    @param HMM:
+        The hidden markov model, which defines a transition model and prior distribution
+
+    @param backwardVector: np.array((S x 1))
+        The backward message vector from the next time step
+        where S is the number of values for the state variable.
+
+    @currEvidence: (E1,..,EN)
+        The values for the evidence at the current time step.
+
+    @returns currBackwardVector: np.array((S x 1))
+        The current backward msg vector.
+"""
 def backward(HMM, backwardVector, currEvidence):
     observationMatrix = buildObservationMatrix(HMM, currEvidence)
 
