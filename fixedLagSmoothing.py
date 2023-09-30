@@ -23,7 +23,6 @@ class FixedLagSmoothing():
             self.evidenceQueue.popleft()
 
             Observation_td = buildObservationMatrix(self.HMM, self.evidenceQueue[0])
-
             interBackwardTransform = np.dot(
                 np.dot(self.dBackwardTransform, self.HMM.transMatrix),
                 Observation_t
