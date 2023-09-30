@@ -6,7 +6,7 @@ import numpy as np
     @param HMM: 
         The hidden markov model, which defines a transition model and prior distribution
 
-    @param ev: [....(E1...EN)]
+    @param evidenceValues: [....(E1...EN)]
         The list of evidence from time 1...t
         where the entries are tuples with the evidence values of all evidence variables.
     
@@ -19,24 +19,26 @@ import numpy as np
 
         This represents the smoothed probability distributions from time 1...t
 """
-def countryDance(HMM, ev, t):
+def countryDance(HMM, evidenceValues, t):
     allForwardVectors = [HMM.priorMatrix]
     allSmoothVectors = []
     backwardVector = np.ones((len(Sleep_S.__members__), 1))
 
+    # from 1..t
     for i in range(1, t+1):
         prevForwardVector = allForwardVectors[i-1]
-        currEvidence = ev[i]
+        currEvidence = evidenceValues[i]
         allForwardVectors.append(
             forward(HMM, prevForwardVector, currEvidence)
         )
-    
+
+    # from t..1
     for i in range(t, 0, -1):
         currForwardVector = allForwardVectors[i]
         currSmoothVector = normalizeVector(
             np.multiply(currForwardVector, backwardVector)
         )
-        currEvidence = ev[i]
+        currEvidence = evidenceValues[i]
 
         allSmoothVectors = [currSmoothVector, *allSmoothVectors]
         backwardVector = backward(HMM, backwardVector, currEvidence)
