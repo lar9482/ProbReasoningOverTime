@@ -28,10 +28,7 @@ class FixedLagSmoothing():
                 Observation_t
             )
             self.dBackwardTransform = np.dot(
-                np.dot(
-                    np.linalg.inv(Observation_td),
-                    np.linalg.inv(self.HMM.transMatrix)
-                ),
+                np.dot(np.linalg.inv(Observation_td), np.linalg.inv(self.HMM.transMatrix)),
                 interBackwardTransform
             )
         else:
