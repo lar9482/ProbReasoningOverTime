@@ -5,7 +5,10 @@ def viterbiAlgorithm(HMM, evidenceFrom1ToN):
 
     # Padding both M and A with a value at time 0
     # in order to begin indexing at 1.
+
+    # The maximum probability of a path starting at any x0 and the evidence seen so far to a given xt at time t
     M = ['None']
+    # The last transition along the best path to x_t 
     A = ['None']
 
     for t in range(1, N+1):
@@ -31,7 +34,11 @@ def viterbiAlgorithm(HMM, evidenceFrom1ToN):
                   * M[t-1][A[t][stateTValue]]
                 )
         
-    print()
+    bestPath = [getArgMaxBestLastState(HMM, M, N)]
+    for t in range(N, 1, -1):
+        bestPath = [A[t][bestPath[0]]] + bestPath
+
+    return bestPath
 
 def argMax_LastTransitionAlongBestPath(HMM, M, currStateTValue, t):
     argMaxPrevStateT_1 = -1
@@ -51,4 +58,16 @@ def argMax_LastTransitionAlongBestPath(HMM, M, currStateTValue, t):
     
     return argMaxPrevStateT_1
         
+def getArgMaxBestLastState(HMM, M, N):
+    argMaxBestLastState = -1
+    bestLastStateProb = -1
+
+    for state in HMM.stateVariable:
+        stateValue = state.value
+        lastStateProb = M[N][stateValue]
+
+        if (lastStateProb > bestLastStateProb):
+            bestLastStateProb = lastStateProb
+            argMaxBestLastState = stateValue
     
+    return argMaxBestLastState
