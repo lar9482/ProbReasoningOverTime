@@ -56,7 +56,7 @@ def backward(HMM, backwardVector, currEvidence):
 
 def buildObservationMatrix(HMM, currEvidence):
     redEyesValue = currEvidence[0]
-    sleepInClassValue = currEvidence[0]
+    sleepInClassValue = currEvidence[1]
     observationMatrix = np.zeros((HMM.stateCardinality, HMM.stateCardinality))
     i = 0
     for sleepStatePossibility in Sleep_S:
