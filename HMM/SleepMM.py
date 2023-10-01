@@ -9,11 +9,12 @@ class SleepMM(HMM):
         self,
         transTable,
         sensorTable,
-        priorTable,    
+        priorTable, 
+        stateCardinality,
         transMatrix,
         priorMatrix
     ):      
-        super().__init__(transTable, sensorTable, priorTable)
+        super().__init__(transTable, sensorTable, priorTable, stateCardinality)
         self.transMatrix = transMatrix
         self.priorMatrix = priorMatrix
     
@@ -26,7 +27,7 @@ class SleepMM(HMM):
 
 def getSleepMM():
 
-    priorMatrix = np.zeros((2, 1))
+    priorMatrix = np.zeros((len(Sleep_S.__members__), 1))
     priorMatrix[Sleep_S.enoughSleep.value] = 0.7
     priorMatrix[Sleep_S.notEnoughSleep.value] = 0.3
 
@@ -37,7 +38,7 @@ def getSleepMM():
 
     # i: previous state value
     # j: current state value
-    transitionMatrix = np.zeros((2, 2))
+    transitionMatrix = np.zeros((len(Sleep_S.__members__), len(Sleep_S.__members__)))
     transitionMatrix[Sleep_S.enoughSleep.value][Sleep_S.enoughSleep.value] = 0.8
     transitionMatrix[Sleep_S.enoughSleep.value][Sleep_S.notEnoughSleep.value] = 0.2
     transitionMatrix[Sleep_S.notEnoughSleep.value][Sleep_S.enoughSleep.value] = 0.3
@@ -63,6 +64,6 @@ def getSleepMM():
     }
 
     return SleepMM(
-        transitionTable, sensorTable, priorTable,
+        transitionTable, sensorTable, priorTable, len(Sleep_S.__members__),
         transitionMatrix, priorMatrix
     )

@@ -23,9 +23,13 @@ class HMM:
 
             S0 is a value for the state variable at time 0
             p is the corresponding probability
+        
+        @param stateCardinality: Int
+            The number of possibilities for the state variable.
     """
-    def __init__(self, transTable, sensorTable, priorTable):
+    def __init__(self, transTable, sensorTable, priorTable, stateCardinality):
         self.transTable = transTable
         self.sensorTable = sensorTable
         self.priorTable = priorTable
+        self.stateCardinality = stateCardinality
 
