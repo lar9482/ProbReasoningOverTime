@@ -18,7 +18,7 @@ def main():
     ]
 
     time = 25
-    completeEvidenceList = [(RedEyes_E.notRedEyes.value, SleepInClass_E.notSleepInClass.value) for _ in range(0, time+1)]
+    completeEvidenceList = [(RedEyes_E.redEyes.value, SleepInClass_E.sleepInClass.value) for _ in range(0, time+1)]
     # completeEvidenceList = [random.choice(allEvidenceTuple) for _ in range(0, time+1)]
 
     twoLagSmoothing = FixedLagSmoothing(sleepMM, 2)
@@ -38,6 +38,7 @@ def main():
         distroAt_T5 = fiveLagSmoothing.runSmoothing(completeEvidenceList[t])
 
         mostLikelyPath = viterbiAlgorithm(sleepMM, evidenceFrom1ToT)
+        
         if (isinstance(distroAt_T2, np.ndarray)):
             print('From Country Dance(2)')
             print(distroFrom1ToT[t-twoLagSmoothing.lagValue-1])
