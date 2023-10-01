@@ -22,7 +22,7 @@ import numpy as np
 def countryDance(HMM, evidenceValues, t):
     allForwardVectors = [HMM.priorMatrix]
     allSmoothVectors = []
-    backwardVector = np.ones((len(Sleep_S.__members__), 1))
+    backwardVector = np.ones((HMM.stateCardinality, 1))
 
     # from 1..t
     for i in range(1, t+1):

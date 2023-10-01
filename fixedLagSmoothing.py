@@ -10,7 +10,7 @@ class FixedLagSmoothing():
         
         self.t = 1
         self.forwardMsg = HMM.priorMatrix
-        self.dBackwardTransform = np.identity(len(Sleep_S.__members__))
+        self.dBackwardTransform = np.identity(HMM.stateCardinality)
         self.evidenceQueue = deque()
 
     def runSmoothing(self, evidenceT):
@@ -44,7 +44,7 @@ class FixedLagSmoothing():
         if (self.t > (self.lagValue+1)):
             backwardMsg = np.dot(
                self.dBackwardTransform,
-               np.ones((len(Sleep_S.__members__), 1)) 
+               np.ones((self.HMM.stateCardinality, 1)) 
             )
             forwardBackwardVector = np.abs(np.multiply(self.forwardMsg, backwardMsg))
 
