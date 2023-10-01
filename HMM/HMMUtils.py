@@ -61,7 +61,7 @@ def buildObservationMatrix(HMM, currEvidence):
     i = 0
     for sleepStatePossibility in Sleep_S:
         sleepValue = sleepStatePossibility.value
-        sensorProb = HMM.lookUpProb_GivenEvidenceAndStateValues(
+        sensorProb = HMM.lookUpSensor_GivenEvidenceAndStateValues(
             redEyesValue,  sleepInClassValue, sleepValue
         )
         observationMatrix[i][i] = sensorProb

@@ -3,6 +3,7 @@ from HMM.SleepMMVariables import SleepInClass_E, RedEyes_E
 
 from countryDance import countryDance
 from fixedLagSmoothing import FixedLagSmoothing
+from viterbiAlgorithm import viterbiAlgorithm
 import random
 import numpy as np
 
@@ -17,7 +18,7 @@ def main():
     ]
 
     time = 25
-    completeEvidenceList = [(RedEyes_E.redEyes.value, SleepInClass_E.notSleepInClass.value) for _ in range(0, time+1)]
+    completeEvidenceList = [(RedEyes_E.notRedEyes.value, SleepInClass_E.notSleepInClass.value) for _ in range(0, time+1)]
     # completeEvidenceList = [random.choice(allEvidenceTuple) for _ in range(0, time+1)]
 
     twoLagSmoothing = FixedLagSmoothing(sleepMM, 2)
@@ -26,14 +27,17 @@ def main():
     fiveLagSmoothing = FixedLagSmoothing(sleepMM, 5)
 
     for t in range(1, time+1):
-        evidenceFrom0ToT = completeEvidenceList[0:t+1]
+        # Padding the evidenceList with a value at time 0
+        # in order to begin indexing at time 1.
+        evidenceFrom1ToT = ["noEvidenceAt0"] + completeEvidenceList[1:t+1]
 
-        distroFrom1ToT = countryDance(sleepMM, evidenceFrom0ToT, t)
+        distroFrom1ToT = countryDance(sleepMM, evidenceFrom1ToT, t)
         distroAt_T2 = twoLagSmoothing.runSmoothing(completeEvidenceList[t])
         distroAt_T3 = threeLagSmoothing.runSmoothing(completeEvidenceList[t])
         distroAt_T4 = fourLagSmoothing.runSmoothing(completeEvidenceList[t])
         distroAt_T5 = fiveLagSmoothing.runSmoothing(completeEvidenceList[t])
 
+        mostLikelyPath = viterbiAlgorithm(sleepMM, evidenceFrom1ToT)
         if (isinstance(distroAt_T2, np.ndarray)):
             print('From Country Dance(2)')
             print(distroFrom1ToT[t-twoLagSmoothing.lagValue-1])
