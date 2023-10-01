@@ -1,11 +1,12 @@
 import sys
 
 def viterbiAlgorithm(HMM, evidenceFrom1ToN):
+    # evidenceFrom1ToN is padded with an artibrary element at the beginning to allow for indexing to 
+    # begin at 1. So, subtract 1 to account for this padding.
     N = len(evidenceFrom1ToN)-1
 
     # Padding both M and A with a value at time 0
     # in order to begin indexing at 1.
-
     # The maximum probability of a path starting at any x0 and the evidence seen so far to a given xt at time t
     M = ['None']
     # The last transition along the best path to x_t 
