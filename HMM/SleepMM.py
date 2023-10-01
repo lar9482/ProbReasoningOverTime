@@ -10,21 +10,25 @@ class SleepMM(HMM):
         transTable,
         sensorTable,
         priorTable, 
+        stateVariable,
         stateCardinality,
         transMatrix,
         priorMatrix
     ):      
-        super().__init__(transTable, sensorTable, priorTable, stateCardinality)
+        super().__init__(transTable, sensorTable, priorTable, stateVariable, stateCardinality)
         self.transMatrix = transMatrix
         self.priorMatrix = priorMatrix
     
-    def lookUpProb_GivenEvidenceAndStateValues(
+    def lookUpSensor_GivenEvidenceAndStateValues(
         self, redEyesValue_E, sleepInClassValue_E, enoughSleepValue_E
     ):
         return self.sensorTable[(
             redEyesValue_E, sleepInClassValue_E, enoughSleepValue_E
         )]
 
+    def lookUpTrans_GivenCurrAndLastTransitionValue(self, currStateValue, prevStateValue):
+        return self.transTable[(prevStateValue, currStateValue)]
+    
 def getSleepMM():
 
     priorMatrix = np.zeros((len(Sleep_S.__members__), 1))
@@ -64,6 +68,6 @@ def getSleepMM():
     }
 
     return SleepMM(
-        transitionTable, sensorTable, priorTable, len(Sleep_S.__members__),
+        transitionTable, sensorTable, priorTable, Sleep_S, len(Sleep_S.__members__),
         transitionMatrix, priorMatrix
     )
