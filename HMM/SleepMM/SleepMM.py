@@ -1,5 +1,5 @@
-from HMM.HMM import HMM
-from HMM.SleepMMVariables import Sleep_S, SleepInClass_E, RedEyes_E
+from HMM.utils.HMM import HMM
+from HMM.SleepMM.SleepMMVariables import Sleep_S, SleepInClass_E, RedEyes_E
 
 import numpy as np
 
@@ -20,10 +20,10 @@ class SleepMM(HMM):
         self.priorMatrix = priorMatrix
     
     def lookUpSensor_GivenEvidenceAndStateValues(
-        self, redEyesValue_E, sleepInClassValue_E, enoughSleepValue_E
+        self, redEyesValue_Ev, sleepInClassValue_Ev, enoughSleepValue_St
     ):
         return self.sensorTable[(
-            redEyesValue_E, sleepInClassValue_E, enoughSleepValue_E
+            redEyesValue_Ev, sleepInClassValue_Ev, enoughSleepValue_St
         )]
 
     def lookUpTrans_GivenCurrAndLastTransitionValue(self, currStateValue, prevStateValue):

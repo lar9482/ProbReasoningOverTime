@@ -1,9 +1,11 @@
-from HMM.SleepMM import getSleepMM
-from HMM.SleepMMVariables import SleepInClass_E, RedEyes_E
+from HMM.SleepMM.SleepMM import getSleepMM
+from HMM.SleepMM.SleepMMVariables import SleepInClass_E, RedEyes_E
 
-from countryDance import countryDance
-from fixedLagSmoothing import FixedLagSmoothing
-from viterbiAlgorithm import viterbiAlgorithm
+from HMM.countryDance import countryDance
+from HMM.fixedLagSmoothing import FixedLagSmoothing
+from HMM.viterbiAlgorithm import viterbiAlgorithm
+
+from CS5313_Localization_Env import localization_env as le
 
 import random
 import numpy as np
@@ -65,8 +67,25 @@ def testHMM():
             print(distroAt_T5)
         print()
 
+def testDBN():
+    action_bias = 0
+    observation_noise = 0.5
+    action_noise = 0.5
+    dimensions = (20, 20)
+    seed = 10
+    (x, y) = (750, 750)
+    env = le.Environment(
+        action_bias, 
+        observation_noise, 
+        action_noise, 
+        dimensions, 
+        seed=seed, 
+        window_size=[x,y])
+    
+    print()
 def main():
-    testHMM()
+    testDBN()
+    # testHMM()
 
 if __name__ == "__main__":
     main()

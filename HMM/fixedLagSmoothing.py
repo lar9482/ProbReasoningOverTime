@@ -1,8 +1,10 @@
-from HMM.SleepMMVariables import Sleep_S
-from HMM.HMMUtils import buildObservationMatrix, forward, normalizeVector
+from HMM.utils.HMMUtils import buildObservationMatrix, forward, normalizeVector
 from collections import deque
 import numpy as np
 
+"""
+    Performs smoothing for P(X_t-d) given P(X_t | E_1:t)
+"""
 class FixedLagSmoothing():
     def __init__(self, HMM, lagValue):
         self.HMM = HMM
