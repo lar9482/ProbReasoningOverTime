@@ -1,5 +1,21 @@
 import sys
 
+"""
+    Performs the most likely explanation
+    argmax_(X_1:t) P(X_1:t | E_1:t )
+
+    That is, find the most likely sequence of states given a sequence of evidence
+
+    @param HMM: 
+        The hidden markov model, which defines a transition model and prior distribution
+    
+    @param evidenceFrom1ToN: [....(E1...EM)]
+        The list of evidence from time 1...N
+        where the entries are tuples with the evidence values of all evidence variables.
+    
+    @param [X1.....XN]
+        The most likely sequence
+"""
 def viterbiAlgorithm(HMM, evidenceFrom1ToN):
     # evidenceFrom1ToN is padded with an artibrary element at the beginning to allow for indexing to 
     # begin at 1. So, subtract 1 to account for this padding.

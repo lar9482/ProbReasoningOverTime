@@ -1,8 +1,13 @@
-from HMM.HMMUtils import forward, backward, normalizeVector
-from HMM.SleepMMVariables import Sleep_S
+from HMM.utils.HMMUtils import forward, backward, normalizeVector
 
 import numpy as np
 """
+    Performs:
+        - Filtering for P(X_t+1 | E_1:t)
+        - Smoothing for P(X_k | E_1:t) where 0 < k <= t
+
+    using the forward-backward algorithm in matrix formulation
+
     @param HMM: 
         The hidden markov model, which defines a transition model and prior distribution
 

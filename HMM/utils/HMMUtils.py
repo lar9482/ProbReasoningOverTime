@@ -1,4 +1,4 @@
-from HMM.SleepMMVariables import Sleep_S
+from HMM.SleepMM.SleepMMVariables import Sleep_S
 import numpy as np
 
 """
@@ -59,7 +59,7 @@ def buildObservationMatrix(HMM, currEvidence):
     sleepInClassValue = currEvidence[1]
     observationMatrix = np.zeros((HMM.stateCardinality, HMM.stateCardinality))
     i = 0
-    for sleepStatePossibility in Sleep_S:
+    for sleepStatePossibility in HMM.stateVariable:
         sleepValue = sleepStatePossibility.value
         sensorProb = HMM.lookUpSensor_GivenEvidenceAndStateValues(
             redEyesValue,  sleepInClassValue, sleepValue
