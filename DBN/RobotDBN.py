@@ -37,57 +37,47 @@ class RobotDBN:
         self.S = self.__generateInitialSamples()
     
     def __generateInitialSamples(self):
-        sampledLocations = self.__getInitialLocationSamples()
-        sampledHeadings = self.__getInitialHeadingSamples()
-        samples = []
-        for i in range(0, self.N):
-            samples.append((
-                sampledLocations[i][0], sampledLocations[i][1], sampledHeadings[i]
-            ))
         
-        return samples
-
-    def __getInitialLocationSamples(self):
-        # This is transformed into a list of tuples, in the form (x, y, prob) at the ith place
-        sortedLocationToProbMap = sorted(self.locationPriorTable.items(), key=lambda x: x[1], reverse=True)
-
-        locations = [locAndProb[0] for locAndProb in sortedLocationToProbMap]
-        sampledLocations = []
-
+        samplesAndProb = self.__constructPriorCombinedTable()
+        initialSamples = []
         for _ in range(0, self.N):
             chance = random.uniform(0, 1)
             probSum = 0
-            i = 0
-            for locAndProb in sortedLocationToProbMap:
-                probSum += locAndProb[1]
-                if (chance < probSum):
-                    sampledLocations.append(locations[i])
+            for prob in list(samplesAndProb.keys()):
+                if (probSum <= chance and chance < (probSum + prob)):
+                    initialSamples.append(random.choice(samplesAndProb[prob]))
                     break
-                i += 1
-        
-        return sampledLocations  
-    
-    def __getInitialHeadingSamples(self):
-        # This is transformed into a list of tuples, in the form (heading, prob) at the ith place
-        sortedHeadingToProbMap = sorted(self.headingPriorTable.items(), key=lambda x: x[1], reverse=True)
+                probSum += prob
 
-        headings = [headAndProb[0] for headAndProb in sortedHeadingToProbMap]
-        sampledHeadings = []
+        return initialSamples
 
-        for _ in range(0, self.N):
-            chance = random.uniform(0, 1)
-            probSum = 0
-            i = 0
-            for headingAndProb in sortedHeadingToProbMap:
-                probSum += headingAndProb[1]
-                if (chance < probSum):
-                    sampledHeadings.append(headings[i])
-                    break
-                i += 1
-        
-        return sampledHeadings
+    def __constructPriorCombinedTable(self):
+        samplesAndProb = {}
+        for location in list(self.locationPriorTable.keys()):
+            for heading in list(self.headingPriorTable.keys()):
+                combinedProb = self.locationPriorTable[location] * self.headingPriorTable[heading]
+                combinedSample = (location[0], location[1], heading)
+
+                if (samplesAndProb.get(combinedProb) == None):
+                    samplesAndProb[combinedProb] = [combinedSample]
+                else:
+                    samplesAndProb[combinedProb].append(combinedSample)
+
+        self.__normalizePriorCombinedTable(samplesAndProb)
+        return samplesAndProb
     
-    def __generateTransitionLocations(self, x, y, heading):
+    def __normalizePriorCombinedTable(self, samplesAndProb):
+        sumOfCombinedPriorProbs = sum(list(samplesAndProb.keys()))
+        for prob in list(samplesAndProb.keys()):
+            if (sumOfCombinedPriorProbs != 1.000):
+                samplesAndProb[prob / sumOfCombinedPriorProbs] = samplesAndProb[prob]
+                samplesAndProb.pop(prob)
+
+
+    ######################################################
+    # Methods that pertain to particle filtering itself. #
+    ######################################################
+    def __generateTransLocationAndProbTable(self, x, y, heading):
         directionProbMap = self.locationTransTable[x][y][heading]
         locationProbMap = {}
         for direction in list(directionProbMap.keys()):
@@ -98,7 +88,7 @@ class RobotDBN:
         return locationProbMap
 
     def __constructFutureSampleProbTable(self, currSample):
-        locationProbTable = self.__generateTransitionLocations(currSample[0], currSample[1], currSample[2])
+        locationProbTable = self.__generateTransLocationAndProbTable(currSample[0], currSample[1], currSample[2])
         headingProbTable = self.headingTransTable[currSample[0]][currSample[1]][currSample[2]]
         
         sampleProbTable = {}
@@ -122,9 +112,19 @@ class RobotDBN:
                 return sample
             probSum += sampleProbTable[sample]
 
+    def __normalizeWeights(self, W):
+        sumWeights = sum(W)
+
+        for i in range(0, len(W)):
+            W[i] = W[i] / sumWeights
+
+    def resampleWithWeights(self, W):
+        self.__normalizeWeights(W)
+        for i in range(0, self.N):
+            pass
+
     def runParticleFilter(self, evidence):
         W = []
         for i in range(0, self.N):
             self.S[i] = self.__sampleFromTransitionModel(self.S[i])
             W.append(self.sensorTable[self.S[i][0]][self.S[i][1]][tuple(evidence)])
-        print()
