@@ -48,7 +48,9 @@ class RobotDBN:
         return samples
 
     def __getInitialLocationSamples(self):
+        # This is transformed into a list of tuples, in the form (x, y, prob) at the ith place
         sortedLocationToProbMap = sorted(self.locationPriorTable.items(), key=lambda x: x[1], reverse=True)
+
         locations = [locAndProb[0] for locAndProb in sortedLocationToProbMap]
         sampledLocations = []
 
@@ -66,8 +68,10 @@ class RobotDBN:
         return sampledLocations  
     
     def __getInitialHeadingSamples(self):
+        # This is transformed into a list of tuples, in the form (heading, prob) at the ith place
         sortedHeadingToProbMap = sorted(self.headingPriorTable.items(), key=lambda x: x[1], reverse=True)
-        locations = [headAndProb[0] for headAndProb in sortedHeadingToProbMap]
+
+        headings = [headAndProb[0] for headAndProb in sortedHeadingToProbMap]
         sampledHeadings = []
 
         for _ in range(0, self.N):
@@ -77,7 +81,7 @@ class RobotDBN:
             for headingAndProb in sortedHeadingToProbMap:
                 probSum += headingAndProb[1]
                 if (chance < probSum):
-                    sampledHeadings.append(locations[i])
+                    sampledHeadings.append(headings[i])
                     break
                 i += 1
         
