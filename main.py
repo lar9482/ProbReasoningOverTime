@@ -6,6 +6,7 @@ from HMM.fixedLagSmoothing import FixedLagSmoothing
 from HMM.viterbiAlgorithm import viterbiAlgorithm
 
 from CS5313_Localization_Env import localization_env as le
+from DBN.RobotDBN import RobotDBN
 
 import random
 import numpy as np
@@ -70,7 +71,7 @@ def testHMM():
 def testDBN():
     action_bias = 0
     observation_noise = 0.5
-    action_noise = 0.5
+    action_noise = 0.75
     dimensions = (20, 20)
     seed = 10
     (x, y) = (750, 750)
@@ -80,9 +81,17 @@ def testDBN():
         action_noise, 
         dimensions, 
         seed=seed, 
-        window_size=[x,y])
+        window_size=[x,y]
+    )
     
-    print()
+    DBN = RobotDBN(env, 100)
+    for _ in range(0, 25):
+        test = env.observation_tables
+        observation = env.move()
+        location = env.robot_location
+        ob_Probability = env.observation_tables[location[0]][location[1]][tuple(observation)]
+        print(observation)
+        print(test == env.observation_tables)
 def main():
     testDBN()
     # testHMM()
