@@ -87,5 +87,44 @@ class RobotDBN:
         
         return sampledHeadings
     
-    def runParticleFilter(evidence):
-        pass
+    def __generateTransitionLocations(self, x, y, heading):
+        directionProbMap = self.locationTransTable[x][y][heading]
+        locationProbMap = {}
+        for direction in list(directionProbMap.keys()):
+            locationProbMap[
+                (x + direction.value[0], y + direction.value[1])
+            ] = directionProbMap[direction]
+
+        return locationProbMap
+
+    def __constructFutureSampleProbTable(self, currSample):
+        locationProbTable = self.__generateTransitionLocations(currSample[0], currSample[1], currSample[2])
+        headingProbTable = self.headingTransTable[currSample[0]][currSample[1]][currSample[2]]
+        
+        sampleProbTable = {}
+        for location in list(locationProbTable.keys()):
+            for heading in list(headingProbTable.keys()):
+                generatedSample = (location[0], location[1], heading)
+                generatedSampleProb = locationProbTable[location] * headingProbTable[heading]
+                sampleProbTable[generatedSample] = generatedSampleProb
+
+        return sampleProbTable
+    
+    def __sampleFromTransitionModel(self, currSample):
+        sampleProbTable = self.__constructFutureSampleProbTable(currSample)
+        probSum = 0
+
+        random.seed(random.randint(0, 99999999))
+        chance = random.uniform(0, 1)
+
+        for sample in list(sampleProbTable.keys()):
+            if (probSum <= chance and chance < (probSum + sampleProbTable[sample])):
+                return sample
+            probSum += sampleProbTable[sample]
+
+    def runParticleFilter(self, evidence):
+        W = []
+        for i in range(0, self.N):
+            self.S[i] = self.__sampleFromTransitionModel(self.S[i])
+            W.append(self.sensorTable[self.S[i][0]][self.S[i][1]][tuple(evidence)])
+        print()

@@ -70,7 +70,7 @@ def testHMM():
 
 def testDBN():
     action_bias = 0
-    observation_noise = 0.5
+    observation_noise = 0.75
     action_noise = 0.75
     dimensions = (20, 20)
     seed = 10
@@ -86,12 +86,8 @@ def testDBN():
     
     DBN = RobotDBN(env, 100)
     for _ in range(0, 25):
-        test = env.observation_tables
         observation = env.move()
-        location = env.robot_location
-        ob_Probability = env.observation_tables[location[0]][location[1]][tuple(observation)]
-        print(observation)
-        print(test == env.observation_tables)
+        DBN.runParticleFilter(observation)
 def main():
     testDBN()
     # testHMM()
