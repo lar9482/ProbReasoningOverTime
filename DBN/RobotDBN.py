@@ -1,5 +1,5 @@
 import random
-
+import copy
 class RobotDBN:
     """    
         Variables that model the DBN:
@@ -103,8 +103,6 @@ class RobotDBN:
     def __sampleFromTransitionModel(self, currSample):
         sampleProbTable = self.__constructFutureSampleProbTable(currSample)
         probSum = 0
-
-        random.seed(random.randint(0, 99999999))
         chance = random.uniform(0, 1)
 
         for sample in list(sampleProbTable.keys()):
@@ -118,13 +116,27 @@ class RobotDBN:
         for i in range(0, len(W)):
             W[i] = W[i] / sumWeights
 
-    def resampleWithWeights(self, W):
+    def __resampleWithWeights(self, W):
         self.__normalizeWeights(W)
+        newSamples = []
         for i in range(0, self.N):
-            pass
+            chance = random.uniform(0, 1)
+            probSum = 0
+
+            for i in range(0, self.N):
+                sampleWeight = W[i]
+                if (probSum <= chance and chance < (sampleWeight+probSum)):
+                    newSamples.append(self.S[i])
+                    break
+                probSum += sampleWeight
+        
+        return newSamples
 
     def runParticleFilter(self, evidence):
         W = []
         for i in range(0, self.N):
             self.S[i] = self.__sampleFromTransitionModel(self.S[i])
             W.append(self.sensorTable[self.S[i][0]][self.S[i][1]][tuple(evidence)])
+
+        self.S = self.__resampleWithWeights(W)
+        return copy.deepcopy(self.S)
