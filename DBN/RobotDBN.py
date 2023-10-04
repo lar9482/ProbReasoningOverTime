@@ -43,6 +43,7 @@ class RobotDBN:
         for _ in range(0, self.N):
             chance = random.uniform(0, 1)
             probSum = 0
+            
             for prob in list(priorSamplesAndProb.keys()):
                 if (probSum <= chance and chance < (probSum + prob)):
                     initialSamples.append(random.choice(priorSamplesAndProb[prob]))
@@ -54,9 +55,12 @@ class RobotDBN:
     def __constructPriorCombinedTable(self):
         priorSamplesAndProb = {}
         for location in list(self.locationPriorTable.keys()):
+            locationX = location[0]
+            locationY = location[1]
+
             for heading in list(self.headingPriorTable.keys()):
                 combinedProb = self.locationPriorTable[location] * self.headingPriorTable[heading]
-                combinedSample = (location[0], location[1], heading)
+                combinedSample = (locationX, locationY, heading)
 
                 if (priorSamplesAndProb.get(combinedProb) == None):
                     priorSamplesAndProb[combinedProb] = [combinedSample]
@@ -77,7 +81,7 @@ class RobotDBN:
     ######################################################
     # Methods that pertain to particle filtering itself. #
     ######################################################
-    def __constructTransLocationAndProbTable(self, x, y, heading):
+    def __buildTransLocationProbTable(self, x, y, heading):
         directionProbMap = self.locationTransTable[x][y][heading]
         transLocationProbMap = {}
         for direction in list(directionProbMap.keys()):
@@ -89,21 +93,21 @@ class RobotDBN:
         return transLocationProbMap
 
     def __constructNextSampleProbTable(self, currSample):
-        currSampleX = currSample[0]
-        currSampleY = currSample[1]
-        currSampleHeading = currSample[2]
+        currX = currSample[0]
+        currY = currSample[1]
+        currHeading = currSample[2]
 
-        locationProbTable = self.__constructTransLocationAndProbTable(currSampleX, currSampleY, currSampleHeading)
-        headingProbTable = self.headingTransTable[currSampleX][currSampleY][currSampleHeading]
+        transLocationProbTable = self.__buildTransLocationProbTable(currX, currY, currHeading)
+        transHeadingProbTable = self.headingTransTable[currX][currY][currHeading]
         
         nextSampleProbTable = {}
-        for location in list(locationProbTable.keys()):
-            for heading in list(headingProbTable.keys()):
-                locationX = location[0]
-                locationY = location[1]
+        for location in list(transLocationProbTable.keys()):
+            locationX = location[0]
+            locationY = location[1]
 
+            for heading in list(transHeadingProbTable.keys()):
                 generatedSample = (locationX, locationY, heading)
-                generatedSampleProb = locationProbTable[location] * headingProbTable[heading]
+                generatedSampleProb = transLocationProbTable[location] * transHeadingProbTable[heading]
                 nextSampleProbTable[generatedSample] = generatedSampleProb
 
         return nextSampleProbTable
