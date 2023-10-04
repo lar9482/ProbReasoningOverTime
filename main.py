@@ -69,11 +69,14 @@ def testHMM():
         print()
 
 def testDBN():
+    dimensionX = 15
+    dimensionY = 15
+
     action_bias = 0
-    observation_noise = 0.05
-    action_noise = 0.05
-    dimensions = (20, 20)
-    seed = 10
+    observation_noise = 0.1
+    action_noise = 0.1
+    dimensions = (dimensionX, dimensionY)
+    seed = 5555
     (x, y) = (750, 750)
     env = le.Environment(
         action_bias, 
@@ -84,11 +87,15 @@ def testDBN():
         window_size=[x,y]
     )
     
-    DBN = RobotDBN(env, 100)
-    for _ in range(0, 100):
-        observation = env.move()
+    DBN = RobotDBN(env, 25)
+    observation = env.observe()
+    for _ in range(0, 10000):
         samples = DBN.runParticleFilter(observation)
-        print((env.robot_location, env.robot_heading))
+        locProbs = DBN.calcLocationProbsFromSamples(samples, dimensionX, dimensionY)
+        headingProbs = DBN.calcHeadingProbsFromSamples(samples)
+
+        env.update(locProbs, headingProbs)
+        observation = env.move()
 
 def main():
     testDBN()
