@@ -38,77 +38,85 @@ class RobotDBN:
     
     def __generateInitialSamples(self):
         
-        samplesAndProb = self.__constructPriorCombinedTable()
+        priorSamplesAndProb = self.__constructPriorCombinedTable()
         initialSamples = []
         for _ in range(0, self.N):
             chance = random.uniform(0, 1)
             probSum = 0
-            for prob in list(samplesAndProb.keys()):
+            for prob in list(priorSamplesAndProb.keys()):
                 if (probSum <= chance and chance < (probSum + prob)):
-                    initialSamples.append(random.choice(samplesAndProb[prob]))
+                    initialSamples.append(random.choice(priorSamplesAndProb[prob]))
                     break
                 probSum += prob
 
         return initialSamples
 
     def __constructPriorCombinedTable(self):
-        samplesAndProb = {}
+        priorSamplesAndProb = {}
         for location in list(self.locationPriorTable.keys()):
             for heading in list(self.headingPriorTable.keys()):
                 combinedProb = self.locationPriorTable[location] * self.headingPriorTable[heading]
                 combinedSample = (location[0], location[1], heading)
 
-                if (samplesAndProb.get(combinedProb) == None):
-                    samplesAndProb[combinedProb] = [combinedSample]
+                if (priorSamplesAndProb.get(combinedProb) == None):
+                    priorSamplesAndProb[combinedProb] = [combinedSample]
                 else:
-                    samplesAndProb[combinedProb].append(combinedSample)
+                    priorSamplesAndProb[combinedProb].append(combinedSample)
 
-        self.__normalizePriorCombinedTable(samplesAndProb)
-        return samplesAndProb
+        self.__normalizePriorCombinedTable(priorSamplesAndProb)
+        return priorSamplesAndProb
     
-    def __normalizePriorCombinedTable(self, samplesAndProb):
-        sumOfCombinedPriorProbs = sum(list(samplesAndProb.keys()))
-        for prob in list(samplesAndProb.keys()):
+    def __normalizePriorCombinedTable(self, priorSamplesAndProb):
+        sumOfCombinedPriorProbs = sum(list(priorSamplesAndProb.keys()))
+        for prob in list(priorSamplesAndProb.keys()):
             if (sumOfCombinedPriorProbs != 1.000):
-                samplesAndProb[prob / sumOfCombinedPriorProbs] = samplesAndProb[prob]
-                samplesAndProb.pop(prob)
+                priorSamplesAndProb[prob / sumOfCombinedPriorProbs] = priorSamplesAndProb[prob]
+                priorSamplesAndProb.pop(prob)
 
 
     ######################################################
     # Methods that pertain to particle filtering itself. #
     ######################################################
-    def __generateTransLocationAndProbTable(self, x, y, heading):
+    def __constructTransLocationAndProbTable(self, x, y, heading):
         directionProbMap = self.locationTransTable[x][y][heading]
-        locationProbMap = {}
+        transLocationProbMap = {}
         for direction in list(directionProbMap.keys()):
-            locationProbMap[
-                (x + direction.value[0], y + direction.value[1])
-            ] = directionProbMap[direction]
+            directionX = direction.value[0]
+            directionY = direction.value[1]
 
-        return locationProbMap
+            transLocationProbMap[(x + directionX, y + directionY)] = directionProbMap[direction]
 
-    def __constructFutureSampleProbTable(self, currSample):
-        locationProbTable = self.__generateTransLocationAndProbTable(currSample[0], currSample[1], currSample[2])
-        headingProbTable = self.headingTransTable[currSample[0]][currSample[1]][currSample[2]]
+        return transLocationProbMap
+
+    def __constructNextSampleProbTable(self, currSample):
+        currSampleX = currSample[0]
+        currSampleY = currSample[1]
+        currSampleHeading = currSample[2]
+
+        locationProbTable = self.__constructTransLocationAndProbTable(currSampleX, currSampleY, currSampleHeading)
+        headingProbTable = self.headingTransTable[currSampleX][currSampleY][currSampleHeading]
         
-        sampleProbTable = {}
+        nextSampleProbTable = {}
         for location in list(locationProbTable.keys()):
             for heading in list(headingProbTable.keys()):
-                generatedSample = (location[0], location[1], heading)
-                generatedSampleProb = locationProbTable[location] * headingProbTable[heading]
-                sampleProbTable[generatedSample] = generatedSampleProb
+                locationX = location[0]
+                locationY = location[1]
 
-        return sampleProbTable
+                generatedSample = (locationX, locationY, heading)
+                generatedSampleProb = locationProbTable[location] * headingProbTable[heading]
+                nextSampleProbTable[generatedSample] = generatedSampleProb
+
+        return nextSampleProbTable
     
     def __sampleFromTransitionModel(self, currSample):
-        sampleProbTable = self.__constructFutureSampleProbTable(currSample)
+        nextSampleProbTable = self.__constructNextSampleProbTable(currSample)
         probSum = 0
         chance = random.uniform(0, 1)
 
-        for sample in list(sampleProbTable.keys()):
-            if (probSum <= chance and chance < (probSum + sampleProbTable[sample])):
+        for sample in list(nextSampleProbTable.keys()):
+            if (probSum <= chance and chance < (probSum + nextSampleProbTable[sample])):
                 return sample
-            probSum += sampleProbTable[sample]
+            probSum += nextSampleProbTable[sample]
 
     def __normalizeWeights(self, W):
         sumWeights = sum(W)
@@ -119,6 +127,7 @@ class RobotDBN:
     def __resampleWithWeights(self, W):
         self.__normalizeWeights(W)
         newSamples = []
+
         for i in range(0, self.N):
             chance = random.uniform(0, 1)
             probSum = 0
@@ -136,7 +145,12 @@ class RobotDBN:
         W = []
         for i in range(0, self.N):
             self.S[i] = self.__sampleFromTransitionModel(self.S[i])
-            W.append(self.sensorTable[self.S[i][0]][self.S[i][1]][tuple(evidence)])
+            S_ix = self.S[i][0]
+            S_iy = self.S[i][1]
+
+            W.append(
+                self.sensorTable[S_ix][S_iy][tuple(evidence)]
+            )
 
         self.S = self.__resampleWithWeights(W)
         return copy.deepcopy(self.S)
