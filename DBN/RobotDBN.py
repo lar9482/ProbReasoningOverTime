@@ -1,5 +1,7 @@
 import random
 import copy
+
+from CS5313_Localization_Env.localization_env import Headings
 class RobotDBN:
     """    
         Variables that model the DBN:
@@ -145,6 +147,47 @@ class RobotDBN:
         
         return newSamples
 
+    def calcLocationProbsFromSamples(self, samples, dimensionX, dimensionY):
+        locProbTable = {}
+        maxX = -1
+        maxY = -1
+        for sample in samples:
+            X = sample[0]
+            Y = sample[1]
+
+            maxX = max(maxX, X)
+            maxY = max(maxY, Y)
+
+            if (locProbTable.get((X, Y)) == None):
+                locProbTable[(X, Y)] = 1
+            else:
+                locProbTable[(X, Y)] += 1
+
+        twoDLocProbTable = [[0] * (dimensionY) for _ in range(dimensionX)]
+        for XY in list(locProbTable.keys()):
+            locProbTable[XY] = locProbTable[XY] / len(samples)
+            twoDLocProbTable[XY[0]][XY[1]] = locProbTable[XY]
+
+        return twoDLocProbTable
+    
+    def calcHeadingProbsFromSamples(self, samples):
+        headingProbTable = {}
+        for sample in samples:
+            sampleHeading = sample[2]
+            if (headingProbTable.get(sampleHeading) == None):
+                headingProbTable[sampleHeading] = 1
+            else:
+                headingProbTable[sampleHeading] += 1
+        
+        for heading in list(headingProbTable.keys()):
+            headingProbTable[heading] = headingProbTable[heading] / len(samples)
+        
+        for unusedHeading in Headings:
+            if (headingProbTable.get(unusedHeading) == None):
+                headingProbTable[unusedHeading] = 0
+
+        return headingProbTable
+    
     def runParticleFilter(self, evidence):
         W = []
         for i in range(0, self.N):
