@@ -72,11 +72,11 @@ def testDBN():
     dimensionX = 15
     dimensionY = 15
 
-    action_bias = 0
-    observation_noise = 0.1
-    action_noise = 0.1
+    action_bias = 0.75
+    observation_noise = 0.15
+    action_noise = 0.15
     dimensions = (dimensionX, dimensionY)
-    seed = 5555
+    seed = 5
     (x, y) = (750, 750)
     env = le.Environment(
         action_bias, 
@@ -87,9 +87,9 @@ def testDBN():
         window_size=[x,y]
     )
     
-    DBN = RobotDBN(env, 25)
+    DBN = RobotDBN(env, 100)
     observation = env.observe()
-    for _ in range(0, 10000):
+    for _ in range(0, 25000):
         samples = DBN.runParticleFilter(observation)
         locProbs = DBN.calcLocationProbsFromSamples(samples, dimensionX, dimensionY)
         headingProbs = DBN.calcHeadingProbsFromSamples(samples)
