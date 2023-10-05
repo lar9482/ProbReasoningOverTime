@@ -148,29 +148,30 @@ class RobotDBN:
         return newSamples
 
     def calcLocationProbsFromSamples(self, samples, dimensionX, dimensionY):
+
+        #Given the samples, construct an initial table {location: prob} by counts
         locProbTable = {}
-        maxX = -1
-        maxY = -1
         for sample in samples:
             X = sample[0]
             Y = sample[1]
-
-            maxX = max(maxX, X)
-            maxY = max(maxY, Y)
-
             if (locProbTable.get((X, Y)) == None):
                 locProbTable[(X, Y)] = 1
             else:
                 locProbTable[(X, Y)] += 1
 
+        #Then, put this table into a 2d list defined by dimensionX, dimension Y
         twoDLocProbTable = [[0] * (dimensionY) for _ in range(dimensionX)]
         for XY in list(locProbTable.keys()):
             locProbTable[XY] = locProbTable[XY] / len(samples)
-            twoDLocProbTable[XY[0]][XY[1]] = locProbTable[XY]
+
+            X = XY[0]
+            Y = XY[1]
+            twoDLocProbTable[X][Y] = locProbTable[XY]
 
         return twoDLocProbTable
     
     def calcHeadingProbsFromSamples(self, samples):
+        #Given the samples, construct an initial table {heading: prob} by counts
         headingProbTable = {}
         for sample in samples:
             sampleHeading = sample[2]
@@ -182,6 +183,7 @@ class RobotDBN:
         for heading in list(headingProbTable.keys()):
             headingProbTable[heading] = headingProbTable[heading] / len(samples)
         
+        #Fill out the rest of the headings that aren't in the samples.
         for unusedHeading in Headings:
             if (headingProbTable.get(unusedHeading) == None):
                 headingProbTable[unusedHeading] = 0
@@ -200,4 +202,4 @@ class RobotDBN:
             )
 
         self.S = self.__resampleWithWeights(W)
-        return copy.deepcopy(self.S)
+        return self.S
