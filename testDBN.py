@@ -2,6 +2,8 @@ from CS5313_Localization_Env import localization_env as le
 from DBN.RobotDBN import RobotDBN
 from openpyxl import Workbook
 
+import random
+
 class testDBNParameters:
     def __init__(self, 
         dimension, 
@@ -25,8 +27,8 @@ class timeStepResult:
 
 def getTestDBNDatasetParameters():
     actionBiases = [-0.5, 0, 0.5]
-    actionNoises = [0.1, 0.5, 0.9]
-    observationNoises = [0.1, 0.5, 0.9]
+    actionNoises = [0.01, 0.5, 0.95]
+    observationNoises = [0.01, 0.5, 0.95]
     dimensions = [10, 20, 30]
     numParticles = [10, 100, 500, 1000]
 
@@ -59,7 +61,7 @@ def runDBNTest(testDBNParameter, totalTimeSteps):
     observation_noise = testDBNParameter.observationNoise
     action_noise = testDBNParameter.actionNoise
     dimensions = (dimensionX, dimensionY)
-    seed = 5000
+    seed = random.randint(0, 999999) 
     (x, y) = (750, 750)
     env = le.Environment(
         action_bias, 
@@ -81,7 +83,7 @@ def runDBNTest(testDBNParameter, totalTimeSteps):
         allTimeStepResults.append(timeStepResult(
             t,
             mostLikelySamples,
-            prob,
+            round(prob, 4),
             (env.robot_location[0], env.robot_location[1], env.robot_heading)
         ))
 
@@ -104,13 +106,36 @@ def saveAllTimeStepResults(testDBNParameter, allTimeStepResults):
         'ObservationNoise: ' + str(testDBNParameter.observationNoise),
         'ActionBias: ' + str(testDBNParameter.actionBias)
     ])
-    sheet.append(['Most Likely State(s)', 'Prob', 'ActualState'])
+    sheet.append([
+        't'
+        'prob', 
+        'predicted x(s)', 
+        'predicted y(s)', 
+        'predicted heading(s)',
+        'actual x',
+        'actual y',
+        'actual heading'
+    ])
 
     for timeStepResult in allTimeStepResults:
+        t = timeStepResult.t
+        prob = timeStepResult.prob
+        predictedXs = [state[0] for state in timeStepResult.mostLikelyState]
+        predictedYs = [state[1] for state in timeStepResult.mostLikelyState]
+        predictedHeadings = [state[2].name for state in timeStepResult.mostLikelyState]
+        actualX = timeStepResult.actualState[0]
+        actualY = timeStepResult.actualState[1]
+        actualHeading = timeStepResult.actualState[2].name
+
         sheet.append([
-            str(timeStepResult.mostLikelyState),
-            str(timeStepResult.prob),
-            str(timeStepResult.actualState)
+            str(t),
+            str(prob),
+            str(predictedXs),
+            str(predictedYs),
+            str(predictedHeadings),
+            str(actualX),
+            str(actualY),
+            str(actualHeading)
         ])
     
     fileName = 'particles_{0}-dim_{1}-actNoise_{2}-obsNoise_{3}-actBias{4}'.format(
