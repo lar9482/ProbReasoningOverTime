@@ -29,8 +29,10 @@ def getTestDBNDatasetParameters():
     actionBiases = [-0.5, 0, 0.5]
     actionNoises = [0.01, 0.5, 0.95]
     observationNoises = [0.01, 0.5, 0.95]
-    dimensions = [10, 20, 30]
-    numParticles = [10, 100, 500, 1000]
+    # dimensions = [10, 20, 30]
+    # numParticles = [10, 100, 500, 1000]
+    dimensions = [10]
+    numParticles = [10]
 
     dataset = {}
     for numParticle in numParticles:
@@ -138,6 +140,11 @@ def saveAllTimeStepResults(testDBNParameter, allTimeStepResults):
             str(actualHeading)
         ])
     
+    saveFilePath = constructRawFilePath(testDBNParameter)
+
+    workbook.save(saveFilePath)
+
+def constructRawFilePath(testDBNParameter):
     fileName = 'particles_{0}-dim_{1}-actNoise_{2}-obsNoise_{3}-actBias{4}'.format(
         str(testDBNParameter.numParticles),
         str(testDBNParameter.dimension),
@@ -146,4 +153,9 @@ def saveAllTimeStepResults(testDBNParameter, allTimeStepResults):
         str(testDBNParameter.actionBias)
     )
 
-    workbook.save('./results/DBN/' + fileName + '.xlsx')
+    filePath = './results/DBN/Dim{0}/{1}.xlsx'.format(
+        str(testDBNParameter.dimension),
+        fileName
+    )
+
+    return filePath
