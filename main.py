@@ -1,6 +1,6 @@
 from testDBN import runDBNTest, getTestDBNDatasetParameters
 from testHMM import testHMM, HMMEvidence
-from multiprocessing import Manager, Lock, Process
+from multiprocessing import Process
 
 def runHMMTests():
     testHMM(HMMEvidence.redEyes_sleepClass)
@@ -31,7 +31,11 @@ def runDBNTests():
             process.join()
             
 def main():
-    runDBNTests()
+    dbnDataset = getTestDBNDatasetParameters()
+    totalTimeSteps = 1000
+
+    runDBNTest(dbnDataset[10][0], totalTimeSteps)
+    # runDBNTests()
 
 if __name__ == "__main__":
     main()
