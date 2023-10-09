@@ -1,47 +1,37 @@
-from testHMM import testHMM
-from testHMM import HMMEvidence
+from testDBN import runDBNTest, getTestDBNDatasetParameters
+from testHMM import testHMM, HMMEvidence
+from multiprocessing import Manager, Lock, Process
 
-from CS5313_Localization_Env import localization_env as le
-from DBN.RobotDBN import RobotDBN
+def runHMMTests():
+    testHMM(HMMEvidence.redEyes_sleepClass)
+    testHMM(HMMEvidence.redEyes_notSleepClass)
+    testHMM(HMMEvidence.notRedEyes_sleepClass)
+    testHMM(HMMEvidence.notRedEyes_notSleepClass)
+    testHMM(HMMEvidence.random)
 
-def testDBN():
-    dimensionX = 10
-    dimensionY = 10
+def runDBNTests():
+    dbnDataset = getTestDBNDatasetParameters()
+    totalTimeSteps = 1000
 
-    action_bias = 0.75
-    observation_noise = 0.15
-    action_noise = 0.15
-    dimensions = (dimensionX, dimensionY)
-    seed = 90895
-    (x, y) = (750, 750)
-    env = le.Environment(
-        action_bias, 
-        observation_noise, 
-        action_noise, 
-        dimensions, 
-        seed=seed, 
-        window_size=[x,y]
-    )
-    
-    DBN = RobotDBN(env, 100)
-    observation = env.observe()
-    for _ in range(0, 1000):
-        samples = DBN.runParticleFilter(observation)
-        (prob, mostLikelySamples) = DBN.getMostLikelySamples(samples)
-        locProbs = DBN.calcLocationProbsFromSamples(samples, dimensionX, dimensionY)
-        headingProbs = DBN.calcHeadingProbsFromSamples(samples)
-        print(prob)
-        print(mostLikelySamples)
-        env.update(locProbs, headingProbs)
-        observation = env.move()
+    for numParticles in list(dbnDataset.keys()):
+        testCases = dbnDataset[numParticles]
 
+        allProcesses = []
+        for testCase in testCases:
+            dbnProcess = Process(
+                target=runDBNTest,
+                args=(testCase, totalTimeSteps)
+            )
+            allProcesses.append(dbnProcess)
+            
+        for process in allProcesses:
+            process.start()
+        
+        for process in allProcesses:
+            process.join()
+            
 def main():
-    testDBN()
-    # testHMM(HMMEvidence.redEyes_sleepClass)
-    # testHMM(HMMEvidence.redEyes_notSleepClass)
-    # testHMM(HMMEvidence.notRedEyes_sleepClass)
-    # testHMM(HMMEvidence.notRedEyes_notSleepClass)
-    # testHMM(HMMEvidence.random)
+    runDBNTests()
 
 if __name__ == "__main__":
     main()
