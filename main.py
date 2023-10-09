@@ -11,7 +11,7 @@ def runHMMTests():
 
 def runDBNTests():
     dbnDataset = getTestDBNDatasetParameters()
-    totalTimeSteps = 1000
+    totalTimeSteps = 500
 
     for numParticles in list(dbnDataset.keys()):
         testCases = dbnDataset[numParticles]
@@ -34,8 +34,8 @@ def main():
     dbnDataset = getTestDBNDatasetParameters()
     totalTimeSteps = 1000
 
-    runDBNTest(dbnDataset[10][0], totalTimeSteps)
-    # runDBNTests()
+    # runDBNTest(dbnDataset[10][0], totalTimeSteps)
+    runDBNTests()
 
 if __name__ == "__main__":
     main()
