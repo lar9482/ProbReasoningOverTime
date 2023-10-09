@@ -146,7 +146,22 @@ class RobotDBN:
                 probSum += sampleWeight
         
         return newSamples
+    
+    def runParticleFilter(self, evidence):
+        W = []
+        for i in range(0, self.N):
+            self.S[i] = self.__sampleFromTransitionModel(self.S[i])
+            S_ix = self.S[i][0]
+            S_iy = self.S[i][1]
 
+            W.append(
+                self.sensorTable[S_ix][S_iy][tuple(evidence)]
+            )
+
+        self.S = self.__resampleWithWeights(W)
+        return self.S
+
+    
     def calcLocationProbsFromSamples(self, samples, dimensionX, dimensionY):
 
         #Given the samples, construct an initial table {location: prob} by counts
@@ -163,6 +178,13 @@ class RobotDBN:
         twoDLocProbTable = [[0] * (dimensionY) for _ in range(dimensionX)]
         for XY in list(locProbTable.keys()):
             locProbTable[XY] = locProbTable[XY] / len(samples)
+
+        # Normalizing the probability entries in locProbTable
+        sumOfRawProbs = sum(locProbTable.values())
+        for XY in list(locProbTable.keys()):
+            rawProbOfXY = locProbTable[XY]
+            normalizedProbOfXY = rawProbOfXY / sumOfRawProbs
+            locProbTable[XY] = normalizedProbOfXY
 
             X = XY[0]
             Y = XY[1]
@@ -183,6 +205,12 @@ class RobotDBN:
         for heading in list(headingProbTable.keys()):
             headingProbTable[heading] = headingProbTable[heading] / len(samples)
         
+        # Normalizing the probability entries in headingProbTable
+        for heading in list(headingProbTable.keys()):
+            rawHeadingProb = headingProbTable[heading]
+            normalizedProb = rawHeadingProb / len(Headings)
+            headingProbTable[heading] = normalizedProb
+
         #Fill out the rest of the headings that aren't in the samples.
         for unusedHeading in Headings:
             if (headingProbTable.get(unusedHeading) == None):
@@ -190,16 +218,34 @@ class RobotDBN:
 
         return headingProbTable
     
-    def runParticleFilter(self, evidence):
-        W = []
-        for i in range(0, self.N):
-            self.S[i] = self.__sampleFromTransitionModel(self.S[i])
-            S_ix = self.S[i][0]
-            S_iy = self.S[i][1]
+    def getMostLikelySamples(self, samples):
+        sampleProbTable = {}
+        probSampleTable = {}
 
-            W.append(
-                self.sensorTable[S_ix][S_iy][tuple(evidence)]
-            )
+        # Counting occurences
+        for sample in samples:
+            if (sampleProbTable.get(sample) == None):
+                sampleProbTable[sample] = 1
+            else:
+                sampleProbTable[sample] += 1
 
-        self.S = self.__resampleWithWeights(W)
-        return self.S
+        # Grouping the count occurences into raw probabilities
+        for sample in samples:
+            prob = sampleProbTable[sample] / len(samples)
+
+            if (probSampleTable.get(prob) == None):
+                probSampleTable[prob] = [sample]
+            
+            elif(not sample in probSampleTable[prob]):
+                probSampleTable[prob].append(sample)
+        
+        # Normalizing the raw probabilities
+        sumProb = sum(list(probSampleTable.keys()))
+        for rawProb in list(probSampleTable.keys()):
+            normalizedProb = rawProb / sumProb
+            probSampleTable[normalizedProb] = probSampleTable[rawProb]
+            if (rawProb != normalizedProb):
+                probSampleTable.pop(rawProb)
+        
+        maxProb = max(list(probSampleTable.keys()))
+        return (maxProb, probSampleTable[maxProb])
