@@ -15,8 +15,8 @@ def runDBNTests():
     dbnDataset = getTestDBNDatasetParameters()
     totalTimeSteps = 1000
 
-    for numParticles in list(dbnDataset.keys()):
-        testCases = dbnDataset[numParticles]
+    for dimension in list(dbnDataset.keys()):
+        testCases = dbnDataset[dimension]
 
         allProcesses = []
         for testCase in testCases:
@@ -31,6 +31,14 @@ def runDBNTests():
         
         for process in allProcesses:
             process.join()
+
+def analyzeDBNTests():
+    dbnDataset = getTestDBNDatasetParameters()
+    for dimension in list(dbnDataset.keys()):
+        testCases = dbnDataset[dimension]
+        for testCase in testCases:
+            analyzeTimeStepResults(testCase)
+
             
 def main():
     dbnDataset = getTestDBNDatasetParameters()
@@ -38,7 +46,8 @@ def main():
 
     # runDBNTest(dbnDataset[10][0], totalTimeSteps)
     # analyzeTimeStepResults(dbnDataset[10][0])
-    runDBNTests()
+    # runDBNTests()
+    analyzeDBNTests()
 
 if __name__ == "__main__":
     main()

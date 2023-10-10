@@ -33,8 +33,8 @@ def getTestDBNDatasetParameters():
     # numParticles = [10]
 
     dataset = {}
-    for numParticle in numParticles:
-        for dimension in dimensions:
+    for dimension in dimensions:
+        for numParticle in numParticles:
             for actionNoise in actionNoises:
                 for observationNoise in observationNoises:
                     for actionBias in actionBiases:
@@ -46,10 +46,10 @@ def getTestDBNDatasetParameters():
                             numParticle
                         )
 
-                        if (dataset.get(numParticle) == None):
-                            dataset[numParticle] = [testCase]
+                        if (dataset.get(dimension) == None):
+                            dataset[dimension] = [testCase]
                         else:
-                            dataset[numParticle].append(testCase)
+                            dataset[dimension].append(testCase)
                         
     return dataset
 

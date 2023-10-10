@@ -2,14 +2,35 @@ from testDBN import constructRawFilePath
 
 import pandas as pd
 import math
+import openpyxl
 
 def analyzeTimeStepResults(testDBNParameter):
-    filePath = constructRawFilePath(testDBNParameter)
-    fileDF = pd.read_excel(filePath, engine='openpyxl')
-    print(fileDF)
-    calculatedDistances = getDistBetweenPredictedAndActual(fileDF)
-    (correctLocations, correctHeadings) = getCorrectStateCount(fileDF)
-    print()
+    rawFilePath = constructRawFilePath(testDBNParameter)
+    rawFileDF = pd.read_excel(rawFilePath, engine='openpyxl')
+    calculatedDistances = getDistBetweenPredictedAndActual(rawFileDF)
+    (correctLocations, correctHeadings) = getCorrectStateCount(rawFileDF)
+
+    analysisFilePath = constructAnalysisFilePath(testDBNParameter)
+    analysisWorkbook = openpyxl.load_workbook(analysisFilePath)
+    analysisSheet = analysisWorkbook.active
+    
+    meanDistances = sum(calculatedDistances) / len(calculatedDistances)
+    varianceDistances = sum([((x - meanDistances) ** 2) for x in calculatedDistances]) / len(calculatedDistances)
+    stdDistances = varianceDistances  ** 0.5
+
+    analysisSheet.append([
+        testDBNParameter.numParticles,
+        testDBNParameter.actionNoise,
+        testDBNParameter.observationNoise,
+        testDBNParameter.actionBias,
+        sum(calculatedDistances),
+        meanDistances,
+        stdDistances,
+        correctLocations,
+        correctHeadings
+    ])
+    analysisWorkbook.save(analysisFilePath)
+    analysisWorkbook.close()
 
 def getDistBetweenPredictedAndActual(fileDF):
     predictedX = getColumnData(fileDF, 'predicted x(s)')
@@ -95,3 +116,9 @@ def getColumnData(fileDF, columnName):
         return subColumnData
     else:
         return list(fileDF[columnName])
+    
+def constructAnalysisFilePath(testDBNParameter):
+    return './results/DBN/Dim{0}/Dim{0}.xlsx'.format(
+        str(testDBNParameter.dimension),
+        str(testDBNParameter.dimension)
+    )
