@@ -2,8 +2,6 @@ from CS5313_Localization_Env import localization_env as le
 from DBN.RobotDBN import RobotDBN
 from openpyxl import Workbook
 
-import random
-
 class testDBNParameters:
     def __init__(self, 
         dimension, 
@@ -63,7 +61,7 @@ def runDBNTest(testDBNParameter, totalTimeSteps):
     observation_noise = testDBNParameter.observationNoise
     action_noise = testDBNParameter.actionNoise
     dimensions = (dimensionX, dimensionY)
-    seed = random.randint(0, 999999) 
+    seed = 7680
     (x, y) = (750, 750)
     env = le.Environment(
         action_bias, 
@@ -102,14 +100,7 @@ def saveAllTimeStepResults(testDBNParameter, allTimeStepResults):
 
     # Add headers
     sheet.append([
-        'NumParticles: ' + str(testDBNParameter.numParticles),
-        'Dimension: ' + str(testDBNParameter.dimension),
-        'ActionNoise: '+ str(testDBNParameter.actionNoise),
-        'ObservationNoise: ' + str(testDBNParameter.observationNoise),
-        'ActionBias: ' + str(testDBNParameter.actionBias)
-    ])
-    sheet.append([
-        't'
+        't',
         'prob', 
         'predicted x(s)', 
         'predicted y(s)', 

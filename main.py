@@ -1,5 +1,7 @@
 from testDBN import runDBNTest, getTestDBNDatasetParameters
 from testHMM import testHMM, HMMEvidence
+
+from analyzeDBNData import analyzeTimeStepResults
 from multiprocessing import Process
 
 def runHMMTests():
@@ -11,7 +13,7 @@ def runHMMTests():
 
 def runDBNTests():
     dbnDataset = getTestDBNDatasetParameters()
-    totalTimeSteps = 500
+    totalTimeSteps = 100
 
     for numParticles in list(dbnDataset.keys()):
         testCases = dbnDataset[numParticles]
@@ -35,7 +37,8 @@ def main():
     totalTimeSteps = 1000
 
     # runDBNTest(dbnDataset[10][0], totalTimeSteps)
-    runDBNTests()
+    analyzeTimeStepResults(dbnDataset[10][0])
+    # runDBNTests()
 
 if __name__ == "__main__":
     main()
