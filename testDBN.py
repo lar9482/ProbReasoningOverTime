@@ -27,10 +27,10 @@ def getTestDBNDatasetParameters():
     actionBiases = [-0.5, 0, 0.5]
     actionNoises = [0.01, 0.5, 0.95]
     observationNoises = [0.01, 0.5, 0.95]
-    # dimensions = [10, 20, 30]
-    # numParticles = [10, 100, 500, 1000]
-    dimensions = [10]
-    numParticles = [10]
+    dimensions = [10, 20, 30]
+    numParticles = [10, 100, 500, 1000]
+    # dimensions = [10]
+    # numParticles = [10]
 
     dataset = {}
     for numParticle in numParticles:
