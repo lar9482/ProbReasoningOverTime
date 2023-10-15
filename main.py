@@ -14,7 +14,7 @@ def runHMMTests():
 
 def runDBNTests():
     dbnDataset = getTestDBNDatasetParameters()
-    totalTimeSteps = 1000
+    totalTimeSteps = 100
 
     for dimension in list(dbnDataset.keys()):
         testCases = dbnDataset[dimension]
@@ -77,8 +77,8 @@ def main():
 
     # runDBNTest(dbnDataset[10][0], totalTimeSteps)
     # analyzeTimeStepResults(dbnDataset[10][0])
-    # runDBNTests()
-    # analyzeDBNTests()
-    runToyDBN()
+    runDBNTests()
+    analyzeDBNTests()
+    # runToyDBN()
 if __name__ == "__main__":
     main()
