@@ -2,9 +2,9 @@ from testDBN import runDBNTest, getTestDBNDatasetParameters
 from testHMM import testHMM, HMMEvidence
 
 from analyzeDBNData import analyzeTimeStepResults
+from analyzeHMMData import plotStateEstimation, plotSmoothing
 from multiprocessing import Process
-from CS5313_Localization_Env.localization_env import le
-from DBN.RobotDBN import RobotDBN
+
 def runHMMTests():
     testHMM(HMMEvidence.redEyes_sleepClass)
     testHMM(HMMEvidence.redEyes_notSleepClass)
@@ -40,36 +40,11 @@ def analyzeDBNTests():
         for testCase in testCases:
             analyzeTimeStepResults(testCase)
 
-def runToyDBN():
-    dimensionX = 20
-    dimensionY = 20
-
-    action_bias = 0.5
-    observation_noise = 0.95
-    action_noise = 0.5
-    dimensions = (dimensionX, dimensionY)
-    seed = 768
-    (x, y) = (750, 750)
-    env = le.Environment(
-        action_bias, 
-        observation_noise, 
-        action_noise, 
-        dimensions, 
-        seed=seed, 
-        window_size=[x,y]
-    )
-    
-    DBN = RobotDBN(env, 1000)
-
-    observation = env.observe()
-    for t in range(1, 9999+1):
-        samples = DBN.runParticleFilter(observation)
-        (prob, mostLikelySamples) = DBN.getMostLikelySamples(samples)
-
-        locProbs = DBN.calcLocationProbsFromSamples(samples, dimensionX, dimensionY)
-        headingProbs = DBN.calcHeadingProbsFromSamples(samples)
-        env.update(locProbs, headingProbs)
-        observation = env.move()
+def analyzeHMMData():
+    evidenceTuples = ['notRedEyes_notSleepClass', 'random']
+    for evidenceTuple in evidenceTuples:
+        # plotStateEstimation(evidenceTuple)
+        plotSmoothing(evidenceTuple)
 
 def main():
     dbnDataset = getTestDBNDatasetParameters()
@@ -77,8 +52,8 @@ def main():
 
     # runDBNTest(dbnDataset[10][0], totalTimeSteps)
     # analyzeTimeStepResults(dbnDataset[10][0])
-    runDBNTests()
-    analyzeDBNTests()
-    # runToyDBN()
+    # runDBNTests()
+    analyzeHMMData()
+
 if __name__ == "__main__":
     main()
