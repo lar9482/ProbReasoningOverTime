@@ -33,7 +33,7 @@ def analyzeTimeStepResults(testDBNParameter):
     analysisWorkbook.save(analysisFilePath)
     analysisWorkbook.close()
 
-def graphTopDistanceAndProbFromDBN(dimension):
+def plotTopDistanceAndProbFromDBN(dimension):
     top = 3
 
     analysisFilePath = constructAnalysisFilePath(dimension)
