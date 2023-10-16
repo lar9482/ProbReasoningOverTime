@@ -1,5 +1,6 @@
 from testDBN import constructRawFilePath
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import math
 import openpyxl
@@ -10,7 +11,7 @@ def analyzeTimeStepResults(testDBNParameter):
     calculatedDistances = getDistBetweenPredictedAndActual(rawFileDF)
     (correctLocations, correctHeadings) = getCorrectStateCount(rawFileDF)
 
-    analysisFilePath = constructAnalysisFilePath(testDBNParameter)
+    analysisFilePath = constructAnalysisFilePath(testDBNParameter.dimension)
     analysisWorkbook = openpyxl.load_workbook(analysisFilePath)
     analysisSheet = analysisWorkbook.active
     
@@ -31,6 +32,62 @@ def analyzeTimeStepResults(testDBNParameter):
     ])
     analysisWorkbook.save(analysisFilePath)
     analysisWorkbook.close()
+
+def graphTopDistanceAndProbFromDBN(dimension):
+    top = 3
+
+    analysisFilePath = constructAnalysisFilePath(dimension)
+    statDF = pd.read_excel(analysisFilePath, engine='openpyxl')
+    filteredDF = statDF.nlargest(top, 'correctLocations')
+    
+    filteredNumParticles = list(filteredDF['numParticles'])
+    filteredActionNoise = list(filteredDF['actionNoise'])
+    filterObservationNoise = list(filteredDF['observationNoise'])
+    filteredActionBias = list(filteredDF['actionBias'])
+    
+    for i in range(0, top):
+        numParticle = filteredNumParticles[i]
+        actionNoise = filteredActionNoise[i]
+        observationNoise = filterObservationNoise[i]
+        actionBias = filteredActionBias[i]
+
+        if (actionBias == 0.0):
+            actionBias = 0
+
+        filename = 'particles_{0}-dim_{1}-actNoise_{2}-obsNoise_{3}-actBias{4}'.format(
+            numParticle,
+            dimension,
+            actionNoise,
+            observationNoise,
+            actionBias
+        )
+
+        rawResultsFilePath = './results/DBN/Dim{0}/{1}.xlsx'.format(
+            str(dimension),
+            filename
+        )
+
+        rawResultsDF = pd.read_excel(rawResultsFilePath, engine='openpyxl')
+        distances = getDistBetweenPredictedAndActual(rawResultsDF)
+        probs = list(rawResultsDF['prob'])
+        
+        plt.xlim(0, len(distances))
+        plt.ylim(0, max(distances))
+        plt.xlabel('Time')
+        plt.ylabel('Distance') 
+        plt.title('Distance between predicted locations and actual locations')
+        plt.plot([i for i in range(0, len(distances))], distances)
+        plt.savefig('./results/DBN/Dim' + str(dimension) + '/'+ filename + '_locations.png')
+        plt.clf()
+
+        plt.xlim(0, len(probs))
+        plt.ylim(0, max(probs))
+        plt.xlabel('Time')
+        plt.ylabel('Probability') 
+        plt.title('Probability over time of the predicted locations')
+        plt.plot([i for i in range(0, len(probs))], probs)
+        plt.savefig('./results/DBN/Dim' + str(dimension) + '/'+ filename + '_probs.png')
+        plt.clf()
 
 def getDistBetweenPredictedAndActual(fileDF):
     predictedX = getColumnData(fileDF, 'predicted x(s)')
@@ -117,8 +174,8 @@ def getColumnData(fileDF, columnName):
     else:
         return list(fileDF[columnName])
     
-def constructAnalysisFilePath(testDBNParameter):
+def constructAnalysisFilePath(dimension):
     return './results/DBN/Dim{0}/Dim{0}.xlsx'.format(
-        str(testDBNParameter.dimension),
-        str(testDBNParameter.dimension)
+        str(dimension),
+        str(dimension)
     )

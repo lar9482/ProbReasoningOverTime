@@ -1,7 +1,7 @@
 from testDBN import runDBNTest, getTestDBNDatasetParameters
 from testHMM import testHMM, HMMEvidence
 
-from analyzeDBNData import analyzeTimeStepResults
+from analyzeDBNData import analyzeTimeStepResults, graphTopDistanceAndProbFromDBN
 from analyzeHMMData import plotStateEstimation, plotSmoothing
 from multiprocessing import Process
 
@@ -43,7 +43,7 @@ def analyzeDBNTests():
 def analyzeHMMData():
     evidenceTuples = ['notRedEyes_notSleepClass', 'random']
     for evidenceTuple in evidenceTuples:
-        # plotStateEstimation(evidenceTuple)
+        plotStateEstimation(evidenceTuple)
         plotSmoothing(evidenceTuple)
 
 def main():
@@ -53,7 +53,11 @@ def main():
     # runDBNTest(dbnDataset[10][0], totalTimeSteps)
     # analyzeTimeStepResults(dbnDataset[10][0])
     # runDBNTests()
-    analyzeHMMData()
+    # analyzeHMMData()
+    graphTopDistanceAndProbFromDBN(10)
+    graphTopDistanceAndProbFromDBN(20)
+    graphTopDistanceAndProbFromDBN(30)
+
 
 if __name__ == "__main__":
     main()

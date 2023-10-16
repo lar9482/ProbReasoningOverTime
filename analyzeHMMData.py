@@ -13,7 +13,7 @@ def plotStateEstimation(evidenceTuple):
     plt.ylabel('Probability of the state being enoughSleep') 
     plt.title('Evidence: ' + evidenceTuple)
     plt.plot(timeSteps, probs)
-    plt.savefig('./results/HMM/' + evidenceTuple + '.png')
+    plt.savefig('./results/HMM/' + evidenceTuple + 'stateEstimation.png')
     plt.clf()
 
 def plotSmoothing(evidenceTuple):
