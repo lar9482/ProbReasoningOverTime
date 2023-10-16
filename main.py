@@ -49,10 +49,13 @@ def analyzeHMMData():
         plotSmoothing(evidenceTuple)
 
 def main():
-    runHMMTests()
-    runDBNTests()
-    analyzeHMMData()
-    analyzeDBNTests()
+    # runHMMTests()
+    # runDBNTests()
+    # analyzeHMMData()
+    # analyzeDBNTests()
+    plotTopDistanceAndProbFromDBN(10)
+    plotTopDistanceAndProbFromDBN(20)
+    plotTopDistanceAndProbFromDBN(30)
 
 if __name__ == "__main__":
     main()
