@@ -72,7 +72,7 @@ def plotTopDistanceAndProbFromDBN(dimension):
         probs = list(rawResultsDF['prob'])
         
         plt.xlim(0, len(distances))
-        plt.ylim(0, max(distances))
+        plt.ylim(-0.2, max(distances)+0.2)
         plt.xlabel('Time')
         plt.ylabel('Distance') 
         plt.title('Distance between predicted locations and actual locations')
@@ -81,7 +81,7 @@ def plotTopDistanceAndProbFromDBN(dimension):
         plt.clf()
 
         plt.xlim(0, len(probs))
-        plt.ylim(0, max(probs))
+        plt.ylim(-0.1, 1.1)
         plt.xlabel('Time')
         plt.ylabel('Probability') 
         plt.title('Probability over time of the predicted locations')
