@@ -22,12 +22,12 @@ Taught by Dr. Sandip Sen at the University of Tulsa in FA 23.
 ## Quick Results:
 
 #### Exact Inference:
-   - Country-Dance, Fixed Lag, and Viterbi are quite accurate
+   - Given fixed evidence, Country-Dance, Fixed Lag, and Viterbi are quite accurate. 
      *  P(S_t | E_1:t), P(S_k | E_1:t) for k < t, and the argmaxS_t P(S_t | E_1:t) match with each other
-   - If there is random evidence, then the performance is these algorithms is not sufficient for accurate prediction
+   - If there is random evidence, then the performance is these algorithms is not sufficient for accurate inference.
 
 #### Approximate Inference:
   - Particle filtering is quite accurate for inference, as long as there are enough particles.
-      - E.G A particle filter instance with 1000 particles for quite good for 20x20 and 30x30 mazes
+      - E.G A particle filter instance with 1000 particles for quite good for 20x20 and 30x30 mazes, given the environment allows for some degree of uncertainty.
 
 For more information about the results, please see [**info**](https://github.com/lar9482/ProbReasoningOverTime/tree/main/info)
